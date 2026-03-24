@@ -1,0 +1,63 @@
+# ============ OS / Edytor ============
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ============ Gradle / Kotlin ============
+.gradle/
+.kotlin/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ============ Android Studio / IntelliJ ============
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ============ Android build outputs ============
+*.apk
+*.ap_
+*.aab
+*.apks
+*.dex
+*.hprof
+output-metadata.json
+
+# ============ Android Studio-specific ============
+local.properties
+google-services.json
+# Opcjonalnie dodaj:
+# keystore.properties
+# signing.properties
+
+# ============ Java / Spring Boot ============
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# ============ Inne artefakty ============
+.npm
+node_modules/
+dist/
+build/
+publish/
+*.lock
+
+# ============ Secret files (decide per project) ============
+*.jks
+*.keystore
+secret.properties
+env.properties
+.env
