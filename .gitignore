@@ -1,15 +1,28 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# ============ OS / Edytor ============
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+Thumbs.db
+
+# ============ Gradle / Kotlin ============
+.gradle/
+.kotlin/
+build/
+
+# ============ IntelliJ ============
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ============ Java / Spring Boot ============
+*.class
+*.jar
+*.war
+*.log
+*.tmp
+target/
+
+# ============ Secret files ============
+*.jks
+*.keystore
+secret.properties
+.env
