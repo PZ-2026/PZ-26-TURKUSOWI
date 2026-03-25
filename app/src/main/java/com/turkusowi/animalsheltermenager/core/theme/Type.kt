@@ -1,4 +1,4 @@
-package com.turkusowi.animalsheltermenager.ui.theme
+package com.turkusowi.animalsheltermenager.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

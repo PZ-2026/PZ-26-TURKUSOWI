@@ -1,0 +1,114 @@
+package com.turkusowi.animalsheltermenager.core.navigation
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navigation
+import com.turkusowi.animalsheltermenager.features.auth.ui.WelcomeLoginPage
+
+@Composable
+fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
+
+    NavHost(
+        navController = navController,
+        startDestination = Routes.AUTH_GRAPH,
+        modifier = modifier
+    ) {
+
+        // ==========================================
+        // --- STREFA AUTORYZACJI ---
+        // ==========================================
+        navigation(
+            startDestination = Routes.LOGIN,
+            route = Routes.AUTH_GRAPH
+        ) {
+            composable(Routes.LOGIN) {
+                WelcomeLoginPage(
+                    onLoginSuccess = {
+                        // Przejście do głównej aplikacji po zalogowaniu
+                        navController.navigate(Routes.MAIN_GRAPH) {
+                            popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
+                        }
+                    },
+                    onEnterAsGuest = {
+                        // Przejście jako gość - w przyszłości można tu przekazać parametr
+                        navController.navigate(Routes.MAIN_GRAPH) {
+                            popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
+                        }
+                    },
+                    onNavigateToRegister = {
+                        navController.navigate(Routes.REGISTER)
+                    }
+                )
+            }
+
+            composable(Routes.REGISTER) {
+                PlaceholderScreen("Ekran Rejestracji") {
+                    navController.popBackStack() // powrót do logowania
+                }
+            }
+        }
+
+        // ==========================================
+        // --- STREFA GŁÓWNA APLIKACJI (Z BOTTOM BAR) ---
+        // ==========================================
+        navigation(
+            startDestination = Routes.HOME,
+            route = Routes.MAIN_GRAPH
+        ) {
+            // ZAKŁADKA 1
+            composable(Routes.HOME) {
+                PlaceholderScreen("Strona Główna (Statystyki)")
+            }
+
+            // ZAKŁADKA 2
+            composable(Routes.ANIMALS) {
+                PlaceholderScreen("Lista Zwierząt") {
+                    // Test przejścia do szczegółów:
+                    navController.navigate(Routes.createAnimalDetailsRoute(1))
+                }
+            }
+
+            // ZAKŁADKA 3
+            composable(Routes.SCHEDULE) {
+                PlaceholderScreen("Terminy i Harmonogram")
+            }
+
+            // ZAKŁADKA 4
+            composable(Routes.PROFILE) {
+                PlaceholderScreen("Mój Profil") {
+                    navController.navigate(Routes.AUTH_GRAPH) {
+                        popUpTo(Routes.MAIN_GRAPH) { inclusive = true }
+                    }
+                }
+            }
+
+            // EKRANY SZCZEGÓŁOWE - Tu nie ma Bottombaru
+            composable(Routes.ANIMAL_DETAILS) { backStackEntry ->
+                val animalId = backStackEntry.arguments?.getString("animalId")
+                PlaceholderScreen("Szczegóły zwierzęcia ID: $animalId") {
+                    navController.popBackStack() // Powrót
+                }
+            }
+        }
+    }
+}
+
+// Komponent tymczasowy na potrzeby szkieletu
+@Composable
+fun PlaceholderScreen(text: String, onClick: () -> Unit = {}) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        androidx.compose.material3.Button(onClick = onClick) {
+            Text(text)
+        }
+    }
+}
