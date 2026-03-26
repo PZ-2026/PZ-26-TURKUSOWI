@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.turkusowi.animalsheltermenager.features.animals.Animal
@@ -98,4 +99,19 @@ fun InfoCard(label: String, value: String, modifier: Modifier) {
             Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun AnimalPanelPagePreview() {
+    val testAnimal = Animal(
+        name = "Maks",
+        breed = "Labrador",
+        age = "4 lata",
+        weight = "24.5 kg",
+        gender = "Samiec",
+        status = "Dostępny"
+    )
+
+    AnimalPanelPage(animal = testAnimal)
 }

@@ -12,7 +12,7 @@ build/
 *.iml
 *.ipr
 *.iws
-
+local.properties
 # ============ Java / Spring Boot ============
 *.class
 *.jar
