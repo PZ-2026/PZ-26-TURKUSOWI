@@ -102,7 +102,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
         ) {
             // ZAKŁADKA 1
             composable(Routes.HOME) {
-                PlaceholderScreen("Strona Główna (Statystyki)")
+                com.turkusowi.animalsheltermenager.features.home.ui.HomePage()
             }
 
             // ZAKŁADKA 2
