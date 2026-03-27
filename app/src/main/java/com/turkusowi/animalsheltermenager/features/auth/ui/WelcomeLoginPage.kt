@@ -13,7 +13,8 @@ import androidx.compose.ui.unit.dp
 fun WelcomeLoginPage(
     onLoginSuccess: () -> Unit,
     onEnterAsGuest: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onNavigateToForgotPassword: () -> Unit
 ) {
     // Tymczasowe stany dla pól tekstowych
     var email by remember { mutableStateOf("") }

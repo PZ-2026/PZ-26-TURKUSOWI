@@ -9,13 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun RegisterPage(
-    onRegisterSuccess: () -> Unit,
+fun ForgotPasswordPage(
+    onSendEmailClick: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(onClick = onNavigateBack) {
-            Text("Pusty ekran: Rejestracja (Kliknij by wrócić)")
+            Text("Pusty ekran: Reset hasła (Kliknij by wrócić)")
         }
     }
 }

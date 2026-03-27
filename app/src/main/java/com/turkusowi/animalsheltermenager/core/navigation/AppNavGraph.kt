@@ -11,6 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.turkusowi.animalsheltermenager.features.auth.ui.WelcomeLoginPage
+import com.turkusowi.animalsheltermenager.features.auth.ui.RegisterPage
+import com.turkusowi.animalsheltermenager.features.auth.ui.VerificationPage
+import com.turkusowi.animalsheltermenager.features.auth.ui.ForgotPasswordPage
 
 @Composable
 fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -44,14 +47,49 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                     },
                     onNavigateToRegister = {
                         navController.navigate(Routes.REGISTER)
+                    },
+                    onNavigateToForgotPassword = {
+                        navController.navigate(Routes.FORGOT_PASSWORD)
                     }
                 )
             }
 
             composable(Routes.REGISTER) {
-                PlaceholderScreen("Ekran Rejestracji") {
-                    navController.popBackStack() // powrót do logowania
-                }
+                RegisterPage(
+                    onRegisterSuccess = {
+                        navController.navigate(Routes.VERIFICATION)
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Routes.VERIFICATION) {
+                VerificationPage(
+                    onVerifySuccess = {
+                        navController.navigate(Routes.MAIN_GRAPH) {
+                            popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
+                        }
+                    },
+                    onResendCode = {
+                        // logika ponownego wysłania
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Routes.FORGOT_PASSWORD) {
+                ForgotPasswordPage(
+                    onSendEmailClick = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
 

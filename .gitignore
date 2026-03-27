@@ -26,3 +26,4 @@ target/
 *.keystore
 secret.properties
 .env
+local.properties
