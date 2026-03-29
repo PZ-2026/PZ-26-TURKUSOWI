@@ -1,5 +1,6 @@
 package com.turkusowi.animalsheltermenager.features.profile.ui
 
+import android.R.attr.theme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -46,7 +47,7 @@ fun ProfilePage() {
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Dariusz Szymanek", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("Dariusz Szymanek", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = com.turkusowi.animalsheltermenager.core.theme.PrimaryGoldenOrange )
                 Text("Wolontariusz • Staż: 6 m-cy", fontSize = 14.sp, color = Color.Gray)
             }
         }
