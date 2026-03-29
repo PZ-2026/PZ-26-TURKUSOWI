@@ -1,28 +1,34 @@
 package com.turkusowi.animalsheltermenager.core.navigation
 
 object Routes {
-    // Grafy główne
+    // GRAFY
     const val AUTH_GRAPH = "auth_graph"
     const val MAIN_GRAPH = "main_graph"
 
-    // Ekrany autoryzacji
+    // AUTH
     const val LOGIN = "login"
     const val REGISTER = "register"
 
-    const val VERIFICATION = "verification"
-    const val FORGOT_PASSWORD = "forgot_password"
-
-    // Główne ekrany z BottomBar (Zakładki)
+    // MAIN TABS
     const val HOME = "home"
     const val ANIMALS = "animals"
     const val SCHEDULE = "schedule"
     const val PROFILE = "profile"
 
-    // Ekrany szczegółowe (bez BottomBaru)
+    // ADMIN
+    const val EMPLOYEE_MANAGEMENT = "employee_management"
+    const val EMPLOYEE_EDIT = "employee_edit"
+    const val EMPLOYEE_ID_ARG = "employeeId"
+    const val EMPLOYEE_EDIT_ROUTE = "$EMPLOYEE_EDIT/{$EMPLOYEE_ID_ARG}"
+
+    // DETAILS
     const val ANIMAL_DETAILS = "animal_details/{animalId}"
 
-    // Funkcja pomocnicza do nawigacji z argumentami
     fun createAnimalDetailsRoute(animalId: Int): String {
         return "animal_details/$animalId"
+    }
+
+    fun createEmployeeEditRoute(employeeId: String): String {
+        return "$EMPLOYEE_EDIT/$employeeId"
     }
 }

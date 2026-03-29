@@ -2,18 +2,24 @@ package com.turkusowi.animalsheltermenager.core.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.turkusowi.animalsheltermenager.features.admin.EmployeeEditViewModel
+import com.turkusowi.animalsheltermenager.features.admin.EmployeeManagementViewModel
+import com.turkusowi.animalsheltermenager.features.admin.ui.AdminPanelPage
+import com.turkusowi.animalsheltermenager.features.admin.ui.EmployeeEditPage
+import com.turkusowi.animalsheltermenager.features.admin.ui.EmployeeManagementPage
 import com.turkusowi.animalsheltermenager.features.auth.ui.WelcomeLoginPage
-import com.turkusowi.animalsheltermenager.features.auth.ui.RegisterPage
-import com.turkusowi.animalsheltermenager.features.auth.ui.VerificationPage
-import com.turkusowi.animalsheltermenager.features.auth.ui.ForgotPasswordPage
 
 @Composable
 fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -34,62 +40,25 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
             composable(Routes.LOGIN) {
                 WelcomeLoginPage(
                     onLoginSuccess = {
-                        // Przejście do głównej aplikacji po zalogowaniu
                         navController.navigate(Routes.MAIN_GRAPH) {
                             popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
                         }
                     },
                     onEnterAsGuest = {
-                        // Przejście jako gość - w przyszłości można tu przekazać parametr
                         navController.navigate(Routes.MAIN_GRAPH) {
                             popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
                         }
                     },
                     onNavigateToRegister = {
                         navController.navigate(Routes.REGISTER)
-                    },
-                    onNavigateToForgotPassword = {
-                        navController.navigate(Routes.FORGOT_PASSWORD)
                     }
                 )
             }
 
             composable(Routes.REGISTER) {
-                RegisterPage(
-                    onRegisterSuccess = {
-                        navController.navigate(Routes.VERIFICATION)
-                    },
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-
-            composable(Routes.VERIFICATION) {
-                VerificationPage(
-                    onVerifySuccess = {
-                        navController.navigate(Routes.MAIN_GRAPH) {
-                            popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
-                        }
-                    },
-                    onResendCode = {
-                        // logika ponownego wysłania
-                    },
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-
-            composable(Routes.FORGOT_PASSWORD) {
-                ForgotPasswordPage(
-                    onSendEmailClick = {
-                        navController.popBackStack()
-                    },
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
+                PlaceholderScreen("Ekran Rejestracji") {
+                    navController.popBackStack()
+                }
             }
         }
 
@@ -108,7 +77,6 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
             // ZAKŁADKA 2
             composable(Routes.ANIMALS) {
                 PlaceholderScreen("Lista Zwierząt") {
-                    // Test przejścia do szczegółów:
                     navController.navigate(Routes.createAnimalDetailsRoute(1))
                 }
             }
@@ -120,32 +88,83 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
 
             // ZAKŁADKA 4
             composable(Routes.PROFILE) {
-                PlaceholderScreen("Mój Profil") {
-                    navController.navigate(Routes.AUTH_GRAPH) {
-                        popUpTo(Routes.MAIN_GRAPH) { inclusive = true }
-                    }
+                val adminViewModel = remember {
+                    com.turkusowi.animalsheltermenager.features.admin.AdminPanelViewModel()
                 }
+
+                AdminPanelPage(
+                    viewModel = adminViewModel,
+                    onManageAccountsClick = {
+                        navController.navigate(Routes.EMPLOYEE_MANAGEMENT)
+                    },
+                    onLogoutClick = {
+                        navController.navigate(Routes.AUTH_GRAPH) {
+                            popUpTo(Routes.MAIN_GRAPH) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // EKRAN ZARZĄDZANIA KONTAMI
+            composable(Routes.EMPLOYEE_MANAGEMENT) {
+                val employeeManagementViewModel = remember {
+                    EmployeeManagementViewModel()
+                }
+
+                EmployeeManagementPage(
+                    viewModel = employeeManagementViewModel,
+                    onEmployeeClick = { employeeId ->
+                        navController.navigate(Routes.createEmployeeEditRoute(employeeId))
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            // EKRAN EDYCJI PRACOWNIKA
+            composable(
+                route = Routes.EMPLOYEE_EDIT_ROUTE,
+                arguments = listOf(
+                    navArgument(Routes.EMPLOYEE_ID_ARG) {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                val employeeId = backStackEntry.arguments
+                    ?.getString(Routes.EMPLOYEE_ID_ARG)
+                    .orEmpty()
+
+                val employeeEditViewModel = remember(employeeId) {
+                    EmployeeEditViewModel(employeeId = employeeId)
+                }
+
+                EmployeeEditPage(
+                    viewModel = employeeEditViewModel,
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
             }
 
             // EKRANY SZCZEGÓŁOWE - Tu nie ma Bottombaru
             composable(Routes.ANIMAL_DETAILS) { backStackEntry ->
                 val animalId = backStackEntry.arguments?.getString("animalId")
                 PlaceholderScreen("Szczegóły zwierzęcia ID: $animalId") {
-                    navController.popBackStack() // Powrót
+                    navController.popBackStack()
                 }
             }
         }
     }
 }
 
-// Komponent tymczasowy na potrzeby szkieletu
 @Composable
 fun PlaceholderScreen(text: String, onClick: () -> Unit = {}) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        androidx.compose.material3.Button(onClick = onClick) {
+        Button(onClick = onClick) {
             Text(text)
         }
     }
