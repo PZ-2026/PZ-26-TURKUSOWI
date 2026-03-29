@@ -120,11 +120,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
 
             // ZAKŁADKA 4
             composable(Routes.PROFILE) {
-                PlaceholderScreen("Mój Profil") {
-                    navController.navigate(Routes.AUTH_GRAPH) {
-                        popUpTo(Routes.MAIN_GRAPH) { inclusive = true }
-                    }
-                }
+                com.turkusowi.animalsheltermenager.features.profile.ui.ProfilePage()
             }
 
             // EKRANY SZCZEGÓŁOWE - Tu nie ma Bottombaru
