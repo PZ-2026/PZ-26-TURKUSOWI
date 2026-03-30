@@ -26,7 +26,8 @@ fun AnimalPanelPage(animal: Animal) {
             text = "← Podopieczny",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+            color = Color.Black
         )
 
         Card(
