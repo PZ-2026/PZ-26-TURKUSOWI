@@ -45,13 +45,19 @@ fun AnimalPanelPage(animal: Animal) {
                     modifier = Modifier.size(120.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text("🐶", fontSize = 60.sp)
+                        Text(
+                            text = when (animal.breed.contains("Kot")) {
+                                true -> "🐱"
+                                else -> "🐶"
+                            },
+                            fontSize = 60.sp
+                            )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = animal.name, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                Text(text = "${animal.breed} • ${animal.age}", color = Color.Gray)
+                Text(text = animal.name, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(text = "${animal.breed} • ${animal.age}", color = Color.Black)
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -95,23 +101,9 @@ fun InfoCard(label: String, value: String, modifier: Modifier) {
         modifier = modifier
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = label, fontSize = 12.sp, color = Color.Gray)
-            Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = label, fontSize = 12.sp, color = Color.Black)
+            Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
         }
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AnimalPanelPagePreview() {
-    val testAnimal = Animal(
-        name = "Maks",
-        breed = "Labrador",
-        age = "4 lata",
-        weight = "24.5 kg",
-        gender = "Samiec",
-        status = "Dostępny"
-    )
-
-    AnimalPanelPage(animal = testAnimal)
-}

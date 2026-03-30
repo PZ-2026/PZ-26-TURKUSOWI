@@ -19,7 +19,8 @@ object Routes {
     const val ANIMAL_DETAILS = "animal_details/{animalId}"
 
     // Funkcja pomocnicza do nawigacji z argumentami
-    fun createAnimalDetailsRoute(animalId: Int): String {
+    //Chwilowa zmiana typu z Int na String w celu sprawdzenia czy wyświetlanie działa
+    fun createAnimalDetailsRoute(animalId: String): String {
         return "animal_details/$animalId"
     }
 }

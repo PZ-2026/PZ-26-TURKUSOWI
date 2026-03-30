@@ -95,7 +95,6 @@ fun AnimalGridItem(animal: Animal, onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // "Zdjecie" (Emoji)
             Box(
                 modifier = Modifier.size(80.dp).align(Alignment.CenterHorizontally),
                 contentAlignment = Alignment.Center
@@ -110,7 +109,7 @@ fun AnimalGridItem(animal: Animal, onClick: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = animal.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = animal.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black)
             Text(text = "${animal.breed} • ${animal.age}", color = Color.Gray, fontSize = 12.sp)
 
             Spacer(modifier = Modifier.height(8.dp))

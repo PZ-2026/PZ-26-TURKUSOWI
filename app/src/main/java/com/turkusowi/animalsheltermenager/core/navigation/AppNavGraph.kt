@@ -13,9 +13,16 @@ import androidx.navigation.navigation
 import com.turkusowi.animalsheltermenager.features.auth.ui.WelcomeLoginPage
 import com.turkusowi.animalsheltermenager.features.animals.ui.AnimalPanelPage
 import com.turkusowi.animalsheltermenager.features.animals.Animal
+import com.turkusowi.animalsheltermenager.features.animals.ui.AnimalListPage
 
 @Composable
 fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
+
+    val dummyAnimals = listOf(
+        Animal("Maks", "Labrador", "4 lata", "24.5 kg", "Samiec", "Dostępny"),
+        Animal("Luna", "Kot Syberyjski", "2 lata", "4 kg", "Samica", "Dostępny"),
+        Animal("Burek", "Mieszaniec", "6 lat", "12 kg", "Samiec", "Na spacerze")
+    )
 
     NavHost(
         navController = navController,
@@ -71,10 +78,12 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
 
             // ZAKŁADKA 2
             composable(Routes.ANIMALS) {
-                PlaceholderScreen("Lista Zwierząt") {
-                    // Test przejścia do szczegółów:
-                    navController.navigate(Routes.createAnimalDetailsRoute(1))
-                }
+                AnimalListPage(
+                    animals = dummyAnimals,
+                    onAnimalClick = { animal ->
+                        navController.navigate(Routes.createAnimalDetailsRoute(animal.name))
+                    }
+                )
             }
 
             // ZAKŁADKA 3
@@ -93,9 +102,17 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
 
             // EKRANY SZCZEGÓŁOWE - Tu nie ma Bottombaru
             composable(Routes.ANIMAL_DETAILS) { backStackEntry ->
-                val animalId = backStackEntry.arguments?.getString("animalId")
-                PlaceholderScreen("Szczegóły zwierzęcia ID: $animalId") {
-                    navController.popBackStack() // Powrót
+                val animalName = backStackEntry.arguments?.getString("animalId")
+                val selectedAnimal = dummyAnimals.find {
+                    it.name.equals(animalName, ignoreCase = true)
+                }
+
+                if (selectedAnimal != null) {
+                    AnimalPanelPage(animal = selectedAnimal)
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Nie znaleziono: $animalName")
+                    }
                 }
             }
         }
