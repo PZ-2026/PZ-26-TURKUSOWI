@@ -11,6 +11,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.turkusowi.animalsheltermenager.features.auth.ui.WelcomeLoginPage
+import com.turkusowi.animalsheltermenager.features.animals.ui.AnimalPanelPage
+import com.turkusowi.animalsheltermenager.features.animals.Animal
 
 @Composable
 fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
