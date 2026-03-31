@@ -1,0 +1,74 @@
+Table role {
+  id integer [primary key]
+  nazwa varchar // Sekretariat, Pracownik, Wolontariusz, Guest
+}
+
+Table uzytkownicy {
+  id integer [primary key]
+  email varchar [unique]
+  haslo_hash varchar
+  imie varchar
+  nazwisko varchar
+  rola_id integer
+  czy_aktywny boolean [default: true]
+  ostatnie_logowanie timestamp
+  data_utworzenia timestamp [default: `now()`]
+  data_modyfikacji timestamp
+
+}
+
+Table rasy {
+  id integer [primary key]
+  typ_zwierzecia varchar
+  rasa varchar
+}
+
+Table zwierzeta {
+  id integer [primary key]
+  imie varchar
+  wiek integer
+  waga decimal
+  plec varchar
+  rasa_id integer
+  status varchar
+  opis text
+  charakter text
+  preferencje_zywieniowe text
+  data_modyfikacji timestamp
+}
+
+Table rezerwacje_spacerow {
+  id integer [primary key]
+  wolontariusz_id integer
+  zwierze_id integer
+  data_spaceru date
+  godzina_start time
+  godzina_koniec time
+  uwagi text
+  data_zapisu timestamp [default: `now()`]
+}
+
+Table historia_medyczna {
+  id integer [primary key]
+  zwierze_id integer
+  pracownik_id integer
+  opis_zabiegu text
+  data_wpisu timestamp
+}
+
+Table raporty_operacyjne {
+  id integer [primary key]
+  data_raportu date
+  sekretarz_id integer
+  typ_raportu varchar
+  uwagi text
+}
+
+// Relacje między tabelami
+Ref: uzytkownicy.rola_id > role.id
+Ref: zwierzeta.rasa_id > rasy.id
+Ref: rezerwacje_spacerow.wolontariusz_id > uzytkownicy.id
+Ref: rezerwacje_spacerow.zwierze_id > zwierzeta.id
+Ref: historia_medyczna.zwierze_id > zwierzeta.id
+Ref: historia_medyczna.pracownik_id > uzytkownicy.id
+Ref: raporty_operacyjne.sekretarz_id > uzytkownicy.id
