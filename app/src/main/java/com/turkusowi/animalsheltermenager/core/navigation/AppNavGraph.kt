@@ -14,6 +14,9 @@ import com.turkusowi.animalsheltermenager.features.auth.ui.WelcomeLoginPage
 import com.turkusowi.animalsheltermenager.features.animals.ui.AnimalPanelPage
 import com.turkusowi.animalsheltermenager.features.animals.Animal
 import com.turkusowi.animalsheltermenager.features.animals.ui.AnimalListPage
+import com.turkusowi.animalsheltermenager.features.auth.ui.RegisterPage
+import com.turkusowi.animalsheltermenager.features.auth.ui.VerificationPage
+import com.turkusowi.animalsheltermenager.features.auth.ui.ForgotPasswordPage
 
 @Composable
 fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -53,14 +56,49 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                     },
                     onNavigateToRegister = {
                         navController.navigate(Routes.REGISTER)
+                    },
+                    onNavigateToForgotPassword = {
+                        navController.navigate(Routes.FORGOT_PASSWORD)
                     }
                 )
             }
 
             composable(Routes.REGISTER) {
-                PlaceholderScreen("Ekran Rejestracji") {
-                    navController.popBackStack() // powrót do logowania
-                }
+                RegisterPage(
+                    onRegisterSuccess = {
+                        navController.navigate(Routes.VERIFICATION)
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Routes.VERIFICATION) {
+                VerificationPage(
+                    onVerifySuccess = {
+                        navController.navigate(Routes.MAIN_GRAPH) {
+                            popUpTo(Routes.AUTH_GRAPH) { inclusive = true }
+                        }
+                    },
+                    onResendCode = {
+                        // logika ponownego wysłania
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Routes.FORGOT_PASSWORD) {
+                ForgotPasswordPage(
+                    onSendEmailClick = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
 
@@ -73,7 +111,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
         ) {
             // ZAKŁADKA 1
             composable(Routes.HOME) {
-                PlaceholderScreen("Strona Główna (Statystyki)")
+                com.turkusowi.animalsheltermenager.features.home.ui.HomePage()
             }
 
             // ZAKŁADKA 2
@@ -93,11 +131,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
 
             // ZAKŁADKA 4
             composable(Routes.PROFILE) {
-                PlaceholderScreen("Mój Profil") {
-                    navController.navigate(Routes.AUTH_GRAPH) {
-                        popUpTo(Routes.MAIN_GRAPH) { inclusive = true }
-                    }
-                }
+                com.turkusowi.animalsheltermenager.features.profile.ui.ProfilePage()
             }
 
             // EKRANY SZCZEGÓŁOWE - Tu nie ma Bottombaru

@@ -9,6 +9,9 @@ object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
 
+    const val VERIFICATION = "verification"
+    const val FORGOT_PASSWORD = "forgot_password"
+
     // Główne ekrany z BottomBar (Zakładki)
     const val HOME = "home"
     const val ANIMALS = "animals"

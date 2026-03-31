@@ -1,11 +1,14 @@
 # ============ OS / Edytor ============
 .DS_Store
 Thumbs.db
+*.swp
+*~
 
 # ============ Gradle / Kotlin ============
 .gradle/
 .kotlin/
 build/
+!gradle/wrapper/gradle-wrapper.jar
 
 # ============ IntelliJ ============
 .idea/
@@ -13,6 +16,8 @@ build/
 *.ipr
 *.iws
 local.properties
+out/
+
 # ============ Java / Spring Boot ============
 *.class
 *.jar
@@ -21,8 +26,9 @@ local.properties
 *.tmp
 target/
 
-# ============ Secret files ============
+# ============ Secret files / SDK ============
 *.jks
 *.keystore
 secret.properties
 .env
+local.properties
