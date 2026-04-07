@@ -15,6 +15,7 @@ build/
 *.iml
 *.ipr
 *.iws
+local.properties
 out/
 
 # ============ Java / Spring Boot ============

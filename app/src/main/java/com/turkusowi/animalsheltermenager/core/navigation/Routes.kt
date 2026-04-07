@@ -24,7 +24,7 @@ object Routes {
     // DETAILS
     const val ANIMAL_DETAILS = "animal_details/{animalId}"
 
-    fun createAnimalDetailsRoute(animalId: Int): String {
+    fun createAnimalDetailsRoute(animalId: String): String {
         return "animal_details/$animalId"
     }
 
