@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  backend-api:
+    build: 
+      context: ./backend # Tu leży Twój zaktualizowany Dockerfile
+    container_name: projekt_backend
+    ports:
+      - "8080:8080" # Mapujemy porty: wchodzisz na localhost:8080 i gada to z kontenerem
