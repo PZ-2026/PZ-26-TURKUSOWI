@@ -1,37 +1,127 @@
-HELP.md
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+# =========================
+# SYSTEM
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# =========================
+# IDE / EDITORS
+# =========================
+.idea/
 *.iml
 *.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
+*.iws
 .vscode/
+
+# =========================
+# LOGS
+# =========================
+*.log
+logs/
+*.out
+*.err
+
+# =========================
+# ENV / SECRETS
+# =========================
+.env
+.env.*
+*.env
+secrets/
+*.pem
+*.key
+
+# =========================
+# ROOT / GENERAL BUILD
+# =========================
+build/
+out/
+bin/
+target/
+
+# =========================
+# GRADLE
+# =========================
+.gradle/
+**/.gradle/
+**/build/
+
+# =========================
+# BACKEND (Spring Boot / Java)
+# =========================
+backend/.gradle/
+backend/build/
+backend/out/
+
+# IntelliJ/STS/Eclipse
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.factorypath
+
+# Wrapper cache (nie ignorujemy samych plików wrappera)
+!backend/gradlew
+!backend/gradlew.bat
+!backend/gradle/wrapper/gradle-wrapper.jar
+!backend/gradle/wrapper/gradle-wrapper.properties
+
+# =========================
+# FRONTEND (Android)
+# =========================
+frontend/.gradle/
+frontend/build/
+frontend/local.properties
+frontend/.cxx/
+frontend/captures/
+
+# Android Studio
+frontend/.idea/caches/
+frontend/.idea/libraries/
+frontend/.idea/modules.xml
+frontend/.idea/workspace.xml
+frontend/.idea/navEditor.xml
+frontend/.idea/assetWizardSettings.xml
+frontend/.idea/shelf/
+frontend/.idea/compiler.xml
+
+# APK / AAB
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# NDK
+*.so
+
+# =========================
+# KOTLIN / JAVA
+# =========================
+*.class
+*.jar
+*.war
+*.ear
+
+# wyjątek dla wrappera i jeśli chcesz trzymać pojedyncze jar-y ręcznie, usuń ten blok
+!backend/gradle/wrapper/gradle-wrapper.jar
+
+# =========================
+# TEST / COVERAGE
+# =========================
+coverage/
+jacoco/
+*.exec
+*.hprof
+
+# =========================
+# DOCKER
+# =========================
+docker-data/
+postgres-data/
+*.pid
+
+# =========================
+# OS GENERATED
+# =========================
+ehthumbs.db
+Icon?
