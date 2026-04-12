@@ -60,7 +60,11 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                     },
                     onNavigateToRegister = {
                         navController.navigate(Routes.REGISTER)
+                    },
+                    onNavigateToForgotPassword = {
+                        navController.navigate(Routes.FORGOT_PASSWORD)
                     }
+
                 )
             }
 
@@ -68,6 +72,17 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                 PlaceholderScreen("Ekran Rejestracji") {
                     navController.popBackStack()
                 }
+            }
+
+            composable(Routes.FORGOT_PASSWORD) {
+                com.turkusowi.animalsheltermenager.features.auth.ui.ForgotPasswordPage(
+                    onSendEmailClick = {
+                        navController.popBackStack()
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
 
