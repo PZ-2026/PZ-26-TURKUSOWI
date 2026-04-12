@@ -1,9 +1,43 @@
 version: '3.8'
 
 services:
-  backend-api:
-    build: 
-      context: ./backend # Tu leży Twój zaktualizowany Dockerfile
-    container_name: projekt_backend
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: projekt_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: animalshelter_db
+      POSTGRES_USER: animalshelter_user
+      POSTGRES_PASSWORD: animalshelter_password
     ports:
-      - "8080:8080" # Mapujemy porty: wchodzisz na localhost:8080 i gada to z kontenerem
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init/01-init-schema.sql:/docker-entrypoint-initdb.d/01-init-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U animalshelter_user -d animalshelter_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend-api:
+    build:
+      context: ./backend
+    container_name: projekt_backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/animalshelter_db
+      SPRING_DATASOURCE_USERNAME: animalshelter_user
+      SPRING_DATASOURCE_PASSWORD: animalshelter_password
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
