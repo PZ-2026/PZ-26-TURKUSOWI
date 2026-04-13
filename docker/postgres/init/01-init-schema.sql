@@ -98,30 +98,3 @@ CREATE INDEX IF NOT EXISTS idx_rezerwacje_spacerow_zwierze_id
 CREATE INDEX IF NOT EXISTS idx_raporty_operacyjne_sekretarz_id
     ON raporty_operacyjne (sekretarz_id);
 
-INSERT INTO "role" (nazwa)
-SELECT 'ADMIN'
-WHERE NOT EXISTS (SELECT 1 FROM "role" WHERE nazwa = 'ADMIN');
-
-INSERT INTO "role" (nazwa)
-SELECT 'PRACOWNIK'
-WHERE NOT EXISTS (SELECT 1 FROM "role" WHERE nazwa = 'PRACOWNIK');
-
-INSERT INTO "role" (nazwa)
-SELECT 'WOLONTARIUSZ'
-WHERE NOT EXISTS (SELECT 1 FROM "role" WHERE nazwa = 'WOLONTARIUSZ');
-
-INSERT INTO "role" (nazwa)
-SELECT 'GOSC'
-WHERE NOT EXISTS (SELECT 1 FROM "role" WHERE nazwa = 'GOSC');
-
-INSERT INTO rasy (typ_zwierzecia, rasa)
-SELECT 'Pies', 'Labrador'
-WHERE NOT EXISTS (
-    SELECT 1 FROM rasy WHERE typ_zwierzecia = 'Pies' AND rasa = 'Labrador'
-);
-
-INSERT INTO rasy (typ_zwierzecia, rasa)
-SELECT 'Kot', 'Kot europejski'
-WHERE NOT EXISTS (
-    SELECT 1 FROM rasy WHERE typ_zwierzecia = 'Kot' AND rasa = 'Kot europejski'
-);
