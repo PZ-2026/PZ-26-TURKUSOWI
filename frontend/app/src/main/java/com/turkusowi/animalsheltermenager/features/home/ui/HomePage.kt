@@ -1,6 +1,7 @@
 package com.turkusowi.animalsheltermenager.features.home.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
@@ -16,7 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun HomePage() {
+fun HomePage(
+    onProfileClick: () -> Unit = {},
+    onAnimalClick: (String) -> Unit = {} // ZMIANA: Dodano akcję kliknięcia w zwierzaka
+) {
     // DOKŁADNE KOLORY Z FIGMY
     val backgroundColor = Color(0xFFFFFBEB)
     val orangeMain = Color(0xFFFF8C00)
@@ -38,7 +42,9 @@ fun HomePage() {
             horizontalArrangement = Arrangement.End
         ) {
             Surface(
-                modifier = Modifier.size(44.dp),
+                modifier = Modifier
+                    .size(44.dp)
+                    .clickable { onProfileClick() },
                 shape = CircleShape,
                 color = Color(0xFFFFCC80)
             ) {
@@ -109,8 +115,7 @@ fun HomePage() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // --- 5. SIATKA ZWIERZAKÓW (2 kolumny, przewijana w dół) ---
-        // Używamy VerticalGrid, żeby mieściły się 2 karty obok siebie
+        // --- 5. SIATKA ZWIERZAKÓW ---
         androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
             columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -118,12 +123,13 @@ fun HomePage() {
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            item { PetMiniCard("Maks", "Labrador • 4 lata", "🐶", "Dostępny") }
-            item { PetMiniCard("Luna", "Syberyjski • 2 lata", "🐱", "Dostępna") }
-            item { PetMiniCard("Burek", "Mieszaniec • 6 lat", "🐕", "Na spacerze") }
-            item { PetMiniCard("Puszek", "Perski • 1 rok", "🐱", "Zarezerwowany") }
-            item { PetMiniCard("Azor", "Owczarek • 3 lata", "🐶", "Dostępny") }
-            item { PetMiniCard("Chrupek", "Chomik • 0.5 roku", "🐹", "Dostępny") }
+            // ZMIANA: Przekazujemy onClick z odpowiednim imieniem zwierzaka
+            item { PetMiniCard("Maks", "Labrador • 4 lata", "🐶", "Dostępny") { onAnimalClick("Maks") } }
+            item { PetMiniCard("Luna", "Syberyjski • 2 lata", "🐱", "Dostępna") { onAnimalClick("Luna") } }
+            item { PetMiniCard("Burek", "Mieszaniec • 6 lat", "🐕", "Na spacerze") { onAnimalClick("Burek") } }
+            item { PetMiniCard("Puszek", "Perski • 1 rok", "🐱", "Zarezerwowany") { onAnimalClick("Puszek") } }
+            item { PetMiniCard("Azor", "Owczarek • 3 lata", "🐶", "Dostępny") { onAnimalClick("Azor") } }
+            item { PetMiniCard("Chrupek", "Chomik • 0.5 roku", "🐹", "Dostępny") { onAnimalClick("Chrupek") } }
         }
     }
 }
@@ -145,17 +151,18 @@ fun HomeStatCard(value: String, label: String, modifier: Modifier, accentColor: 
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetMiniCard(name: String, desc: String, emoji: String, status: String) {
-    // Dobór koloru tła statusu
+fun PetMiniCard(name: String, desc: String, emoji: String, status: String, onClick: () -> Unit) {
     val statusColor = when (status) {
-        "Dostępny", "Dostępna" -> Color(0xFFE8F5E9) to Color(0xFF4CAF50) // Zielony
-        "Na spacerze" -> Color(0xFFE3F2FD) to Color(0xFF2196F3)         // Niebieski
-        "Zarezerwowany", "Zarezerwowana" -> Color(0xFFFFEBEE) to Color(0xFFE53935) // Jasnoczerwone tło i mocny czerwony tekst
-        else -> Color(0xFFF5F5F5) to Color(0xFF757575)                  // Szary dla reszty
+        "Dostępny", "Dostępna" -> Color(0xFFE8F5E9) to Color(0xFF4CAF50)
+        "Na spacerze" -> Color(0xFFE3F2FD) to Color(0xFF2196F3)
+        "Zarezerwowany", "Zarezerwowana" -> Color(0xFFFFEBEE) to Color(0xFFE53935)
+        else -> Color(0xFFF5F5F5) to Color(0xFF757575)
     }
 
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -168,7 +175,6 @@ fun PetMiniCard(name: String, desc: String, emoji: String, status: String) {
                     .background(Color(0xFFFDF7E7), RoundedCornerShape(18.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                // Serduszko (ikona ulubionych) w rogu
                 Surface(
                     modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(28.dp),
                     shape = CircleShape,
@@ -183,7 +189,10 @@ fun PetMiniCard(name: String, desc: String, emoji: String, status: String) {
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            Text(name, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+
+            // ZMIANA: Dodano wymuszony czarny kolor dla imienia (color = Color.Black)
+            Text(name, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.Black)
+
             Text(desc, fontSize = 12.sp, color = Color.Gray)
 
             Spacer(modifier = Modifier.height(8.dp))

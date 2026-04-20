@@ -1,10 +1,11 @@
 package com.turkusowi.animalsheltermenager.features.animals.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,7 +15,27 @@ import androidx.compose.ui.unit.sp
 import com.turkusowi.animalsheltermenager.features.animals.Animal
 
 @Composable
-fun AnimalPanelPage(animal: Animal) {
+fun AnimalPanelPage(
+    animal: Animal,
+    onBackClick: () -> Unit = {}
+) {
+    // ZMIANA: Zmienna do pamiętania czasu ostatniego kliknięcia
+    var lastClickTime by remember { mutableLongStateOf(0L) }
+
+    val statusBgColor = when (animal.status) {
+        "Dostępny", "Dostępna" -> Color(0xFFE8F5E9)
+        "Na spacerze" -> Color(0xFFE3F2FD)
+        "Zarezerwowany", "Zarezerwowana" -> Color(0xFFFFEBEE)
+        else -> Color(0xFFF5F5F5)
+    }
+
+    val statusTextColor = when (animal.status) {
+        "Dostępny", "Dostępna" -> Color(0xFF4CAF50)
+        "Na spacerze" -> Color(0xFF2196F3)
+        "Zarezerwowany", "Zarezerwowana" -> Color(0xFFE53935)
+        else -> Color(0xFF757575)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -26,7 +47,17 @@ fun AnimalPanelPage(animal: Animal) {
             text = "← Podopieczny",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp)
+                .clickable {
+                    // ZMIANA: Zabezpieczenie przed tzw. "double clickiem"
+                    val currentTime = System.currentTimeMillis()
+                    if (currentTime - lastClickTime > 1000L) { // Blokada na 1000 milisekund (1 sekunda)
+                        lastClickTime = currentTime
+                        onBackClick()
+                    }
+                },
             color = Color.Black
         )
 
@@ -51,7 +82,7 @@ fun AnimalPanelPage(animal: Animal) {
                                 else -> "🐶"
                             },
                             fontSize = 60.sp
-                            )
+                        )
                     }
                 }
 
@@ -62,13 +93,13 @@ fun AnimalPanelPage(animal: Animal) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Surface(
-                    color = Color(0xFFE8F5E9),
+                    color = statusBgColor,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(
                         text = animal.status,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                        color = Color(0xFF4CAF50),
+                        color = statusTextColor,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -106,4 +137,3 @@ fun InfoCard(label: String, value: String, modifier: Modifier) {
         }
     }
 }
-

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -95,7 +96,20 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
         ) {
             // ZAKŁADKA 1
             composable(Routes.HOME) {
-                com.turkusowi.animalsheltermenager.features.home.ui.HomePage()
+                com.turkusowi.animalsheltermenager.features.home.ui.HomePage(
+                    onProfileClick = {
+                        navController.navigate(Routes.PROFILE) {
+                            launchSingleTop = true
+                            restoreState = true
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                        }
+                    },
+                    onAnimalClick = { animalName ->
+                        navController.navigate(Routes.createAnimalDetailsRoute(animalName))
+                    }
+                )
             }
 
             // ZAKŁADKA 2
@@ -174,7 +188,6 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                 )
             }
 
-            // EKRANY SZCZEGÓŁOWE - Tu nie ma Bottombaru
             composable(Routes.ANIMAL_DETAILS) { backStackEntry ->
                 val animalName = backStackEntry.arguments?.getString("animalId")
                 val selectedAnimal = dummyAnimals.find {
@@ -182,7 +195,10 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                 }
 
                 if (selectedAnimal != null) {
-                    AnimalPanelPage(animal = selectedAnimal)
+                    AnimalPanelPage(
+                        animal = selectedAnimal,
+                        onBackClick = { navController.popBackStack() } // ZMIANA: Wraca poprawnie skądkolwiek przyszedłeś
+                    )
                 } else {
                     Box(
                         modifier = Modifier.fillMaxSize(),
