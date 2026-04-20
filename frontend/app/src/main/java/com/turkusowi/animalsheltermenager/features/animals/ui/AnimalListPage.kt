@@ -55,6 +55,7 @@ fun AnimalListPage(
                 unfocusedContainerColor = Color.White,
                 cursorColor = Color(0xFFFF8C00),
                 focusedLabelColor = Color(0xFFFF8C00),
+                focusedTextColor = Color.Gray,
             ),
             shape = RoundedCornerShape(12.dp),
             singleLine = true
