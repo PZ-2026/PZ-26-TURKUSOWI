@@ -20,6 +20,7 @@ repositories {
 dependencies {
     // 1. Serwer i API
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // 2. Security
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -31,5 +32,10 @@ dependencies {
     // 4. Pakiety testowe
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

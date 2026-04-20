@@ -1,0 +1,24 @@
+# IDE / local project files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Gradle / build outputs
+.gradle/
+**/.gradle/
+**/build/
+**/out/
+.kotlin/
+
+# Android / local machine files
+frontend/.cxx/
+frontend/captures/
+frontend/local.properties
+
+# General logs / coverage
+*.log
+coverage/
+jacoco/
+*.exec
