@@ -1,5 +1,7 @@
 package com.turkusowi.backendapi.rasy;
 
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -8,19 +10,36 @@ import java.util.List;
 @RequestMapping("/api/rasy")
 public class RasaController {
 
-    private final RasaRepository rasaRepository;
+    private final RasaService rasaService;
 
-    public RasaController(RasaRepository rasaRepository) {
-        this.rasaRepository = rasaRepository;
+    public RasaController(RasaService rasaService) {
+        this.rasaService = rasaService;
     }
 
     @GetMapping
-    public List<Rasa> findAll() {
-        return rasaRepository.findAll();
+    public List<RasaResponse> findAll() {
+        return rasaService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public RasaResponse findById(@PathVariable Integer id) {
+        return rasaService.findById(id);
     }
 
     @PostMapping
-    public Rasa create(@RequestBody Rasa rasa) {
-        return rasaRepository.save(rasa);
+    @ResponseStatus(HttpStatus.CREATED)
+    public RasaResponse create(@Valid @RequestBody UpsertRasaRequest request) {
+        return rasaService.create(request);
+    }
+
+    @PutMapping("/{id}")
+    public RasaResponse update(@PathVariable Integer id, @Valid @RequestBody UpsertRasaRequest request) {
+        return rasaService.update(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Integer id) {
+        rasaService.delete(id);
     }
 }
