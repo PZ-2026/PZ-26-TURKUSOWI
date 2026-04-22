@@ -75,3 +75,19 @@ record UzytkownikResponse(
         LocalDateTime dataModyfikacji
 ) {
 }
+
+record LoginRequest(
+        @NotBlank(message = "Email jest wymagany")
+        String email,
+        @NotBlank(message = "Haslo jest wymagane")
+        String haslo
+){
+
+}
+
+record LoginResponse(
+        String token,
+        UzytkownikResponse uzytkownik
+) {
+
+}

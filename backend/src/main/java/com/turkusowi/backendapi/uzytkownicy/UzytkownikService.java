@@ -7,6 +7,7 @@ import com.turkusowi.backendapi.role.RolaService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -100,6 +101,24 @@ public class UzytkownikService {
                 uzytkownik.getDataUtworzenia(),
                 uzytkownik.getDataModyfikacji()
         );
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        Uzytkownik uzytkownik = uzytkownikRepository.findByEmailIgnoreCase(request.email())
+                .orElseThrow(() -> new NotFoundException("Niepoprawny email lub haslo"));
+
+        if(!uzytkownik.getHasloHash().equals(request.haslo())) {
+            throw new ConflictException("Niepoprawny email lub haslo");
+        }
+
+        if(!uzytkownik.isCzyAktywny()) {
+            throw new ConflictException("Konto uzytkownika jest nieaktywne");
+        }
+
+        uzytkownik.setOstatnieLogowanie(java.time.LocalDateTime.now());
+        uzytkownikRepository.save(uzytkownik);
+
+        return new LoginResponse("mock-token", mapToResponse(uzytkownik));
     }
 
     sealed interface BaseUzytkownikRequest permits CreateUzytkownikRequest, UpdateUzytkownikRequest {

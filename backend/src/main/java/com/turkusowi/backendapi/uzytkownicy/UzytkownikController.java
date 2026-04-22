@@ -29,6 +29,12 @@ public class UzytkownikController {
         return uzytkownikService.findById(id);
     }
 
+    @PostMapping("/login")
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+        return uzytkownikService.login(request);
+    }
+
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UzytkownikResponse create(@Valid @RequestBody CreateUzytkownikRequest request) {
