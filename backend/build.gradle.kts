@@ -8,9 +8,8 @@ group = "com.turkusowi"
 version = "0.0.1-SNAPSHOT"
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
@@ -34,6 +33,11 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
     testRuntimeOnly("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // 5. JWT
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 }
 
 tasks.withType<Test> {

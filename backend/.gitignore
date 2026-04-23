@@ -53,6 +53,7 @@ target/
 backend/.gradle/
 backend/build/
 backend/out/
+local.properties
 
 # IntelliJ/STS/Eclipse
 backend/.classpath
