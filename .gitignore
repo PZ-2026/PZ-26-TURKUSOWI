@@ -12,11 +12,6 @@
 **/out/
 .kotlin/
 
-# Android / local machine files
-frontend/.cxx/
-frontend/captures/
-frontend/local.properties
-
 # General logs / coverage
 *.log
 coverage/
