@@ -17,19 +17,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("!!!! Proba logowania dla email: " + email); // DODAJ TO
-
         Uzytkownik uzytkownik = repository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> {
                     System.out.println("!!!! NIE ZNALEZIONO W BAZIE: " + email);
                     return new UsernameNotFoundException("Nie znaleziono: " + email);
                 });
 
-        System.out.println("!!!! ZNALEZIONO W BAZIE. Haslo to: " + uzytkownik.getHasloHash());
-
         return User.builder()
                 .username(uzytkownik.getEmail())
-                .password("{noop}" + uzytkownik.getHasloHash()) // Sprawdź czy masz {noop}!
+                .password("{noop}" + uzytkownik.getHasloHash())
                 .roles("USER")
                 .build();
     }
