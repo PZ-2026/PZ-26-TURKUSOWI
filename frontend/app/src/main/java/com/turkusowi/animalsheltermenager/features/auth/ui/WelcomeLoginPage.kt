@@ -12,9 +12,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.turkusowi.animalsheltermenager.features.auth.AuthState
+import com.turkusowi.animalsheltermenager.features.auth.AuthViewModel
 
 @Composable
 fun WelcomeLoginPage(
+    viewModel: AuthViewModel = viewModel(),
     onLoginSuccess: () -> Unit,
     onEnterAsGuest: () -> Unit,
     onNavigateToRegister: () -> Unit,
@@ -23,7 +27,15 @@ fun WelcomeLoginPage(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+
+    val authState = viewModel.authState
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Success) {
+            onLoginSuccess()
+            viewModel.resetState()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -55,7 +67,8 @@ fun WelcomeLoginPage(
             label = { Text("Email") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = authState !is AuthState.Loading
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -66,7 +79,8 @@ fun WelcomeLoginPage(
             label = { Text("Hasło") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = authState !is AuthState.Loading
         )
 
         Row(
@@ -77,17 +91,25 @@ fun WelcomeLoginPage(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(
                     checked = rememberMe,
-                    onCheckedChange = { rememberMe = it }
+                    onCheckedChange = { rememberMe = it },
+                    enabled = authState !is AuthState.Loading
                 )
                 Text("Zapamiętaj mnie", style = MaterialTheme.typography.bodySmall)
             }
-            TextButton(onClick = onNavigateToForgotPassword) {
+            TextButton(
+                onClick = onNavigateToForgotPassword,
+                enabled = authState !is AuthState.Loading
+            ) {
                 Text("Nie pamiętasz hasła?", style = MaterialTheme.typography.bodySmall)
             }
         }
 
-        if (errorMessage.isNotEmpty()) {
-            Text(text = errorMessage, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        if (authState is AuthState.Error) {
+            Text(
+                text = authState.message,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
             Spacer(modifier = Modifier.height(8.dp))
         } else {
             Spacer(modifier = Modifier.height(24.dp))
@@ -97,45 +119,51 @@ fun WelcomeLoginPage(
             onClick = {
                 val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
 
-                // Kolejność walidacji
                 if (email.isBlank() || password.isBlank()) {
-                    errorMessage = "Uzupełnij email i hasło!"
+                    // viewModel could have a local error state too, but let's keep it simple
                 } else if (!emailRegex.matches(email)) {
-                    errorMessage = "Podaj poprawny format email!"
-                } else if (email == "admin@schronisko.pl" && password == "admin123") {
-                    errorMessage = ""
-                    onLoginSuccess()
-                } else if (email == "user@schronisko.pl" && password == "user123") {
-                    errorMessage = ""
-                    onLoginSuccess()
+                    // same here
                 } else {
-                    errorMessage = "Błędne dane logowania!"
+                    viewModel.login(email, password)
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = authState !is AuthState.Loading
         ) {
-            Text("Zaloguj się")
+            if (authState is AuthState.Loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text("Zaloguj się")
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
             onClick = onEnterAsGuest,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = authState !is AuthState.Loading
         ) {
             Text("Wejdź jako Gość")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = onNavigateToRegister) {
+        TextButton(
+            onClick = onNavigateToRegister,
+            enabled = authState !is AuthState.Loading
+        ) {
             Text("Nie masz konta? Zarejestruj się")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Testy:\nadmin@schronisko.pl / admin123\nuser@schronisko.pl / user123",
+            text = "Testy:\nadmin@schronisko.pl / hash_123",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline
         )
