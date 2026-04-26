@@ -33,13 +33,13 @@ public class Zwierze {
     @Column(name = "status", length = 100)
     private String status;
 
-    @Column(name = "opis")
+    @Column(name = "opis", columnDefinition = "TEXT")
     private String opis;
 
-    @Column(name = "charakter")
+    @Column(name = "charakter", columnDefinition = "TEXT")
     private String charakter;
 
-    @Column(name = "preferencje_zywieniowe")
+    @Column(name = "preferencje_zywieniowe", columnDefinition = "TEXT")
     private String preferencjeZywieniowe;
 
     @Column(name = "data_modyfikacji", nullable = false)

@@ -33,7 +33,7 @@ public class RezerwacjaSpaceru {
     @Column(name = "godzina_koniec", nullable = false)
     private LocalTime godzinaKoniec;
 
-    @Column(name = "uwagi")
+    @Column(name = "uwagi", columnDefinition = "TEXT")
     private String uwagi;
 
     @Column(name = "data_zapisu", nullable = false)
