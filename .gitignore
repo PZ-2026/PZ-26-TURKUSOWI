@@ -4,6 +4,8 @@
 *.ipr
 *.iws
 .vscode/
+local.properties
+**/local.properties
 
 # Gradle / build outputs
 .gradle/

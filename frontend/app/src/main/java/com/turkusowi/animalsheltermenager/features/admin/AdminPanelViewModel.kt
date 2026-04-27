@@ -16,30 +16,28 @@ data class AdminPanelUiState(
 )
 
 class AdminPanelViewModel(
-    private val repository: AdminRepository = InMemoryAdminRepository
+    private val repository: AdminRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdminPanelUiState())
     val uiState: StateFlow<AdminPanelUiState> = _uiState.asStateFlow()
 
     init {
-        observeData()
+        refresh()
     }
 
-    private fun observeData() {
+    fun refresh() {
         viewModelScope.launch {
-            repository.employeesFlow.collect {
-                val admin = repository.getLoggedAdmin()
-                val summary = repository.getDashboardSummary()
+            val admin = repository.getLoggedAdmin()
+            val summary = repository.getDashboardSummary()
 
-                _uiState.value = AdminPanelUiState(
-                    adminName = admin.fullName,
-                    adminInitials = admin.initials,
-                    adminRole = admin.role.label,
-                    managedAccounts = summary.managedAccounts,
-                    newReports = summary.newReports
-                )
-            }
+            _uiState.value = AdminPanelUiState(
+                adminName = admin.fullName,
+                adminInitials = admin.initials,
+                adminRole = admin.role.label,
+                managedAccounts = summary.managedAccounts,
+                newReports = summary.newReports
+            )
         }
     }
 }

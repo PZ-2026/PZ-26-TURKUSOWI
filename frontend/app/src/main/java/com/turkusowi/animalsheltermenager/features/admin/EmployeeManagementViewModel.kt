@@ -3,56 +3,60 @@ package com.turkusowi.animalsheltermenager.features.admin
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 data class EmployeeManagementUiState(
     val searchQuery: String = "",
     val onlyActive: Boolean = false,
-    val employees: List<Employee> = emptyList()
+    val employees: List<Employee> = emptyList(),
+    val isLoading: Boolean = true
 )
 
 class EmployeeManagementViewModel(
-    private val repository: AdminRepository = InMemoryAdminRepository
+    private val repository: AdminRepository
 ) : ViewModel() {
 
-    private val searchQueryFlow = MutableStateFlow("")
-    private val onlyActiveFlow = MutableStateFlow(false)
+    private val _uiState = MutableStateFlow(EmployeeManagementUiState())
+    val uiState: StateFlow<EmployeeManagementUiState> = _uiState.asStateFlow()
 
-    val uiState: StateFlow<EmployeeManagementUiState> = combine(
-        repository.employeesFlow,
-        searchQueryFlow,
-        onlyActiveFlow
-    ) { employees, searchQuery, onlyActive ->
+    private var allEmployees: List<Employee> = emptyList()
 
-        val filteredEmployees = employees.filter { employee ->
-            val matchesQuery = searchQuery.isBlank() ||
-                    employee.fullName.contains(searchQuery, ignoreCase = true) ||
-                    employee.email.contains(searchQuery, ignoreCase = true)
+    init {
+        refresh()
+    }
 
-            val matchesStatus = !onlyActive || employee.status == EmployeeStatus.ACTIVE
-
-            matchesQuery && matchesStatus
+    fun refresh() {
+        viewModelScope.launch {
+            val onlyActive = _uiState.value.onlyActive
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            allEmployees = repository.getEmployees(onlyActive = onlyActive)
+            applyFilters()
         }
-
-        EmployeeManagementUiState(
-            searchQuery = searchQuery,
-            onlyActive = onlyActive,
-            employees = filteredEmployees
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = EmployeeManagementUiState()
-    )
+    }
 
     fun onSearchQueryChange(value: String) {
-        searchQueryFlow.value = value
+        _uiState.value = _uiState.value.copy(searchQuery = value)
+        applyFilters()
     }
 
     fun onOnlyActiveChange(value: Boolean) {
-        onlyActiveFlow.value = value
+        _uiState.value = _uiState.value.copy(onlyActive = value)
+        refresh()
+    }
+
+    private fun applyFilters() {
+        val searchQuery = _uiState.value.searchQuery
+        val filteredEmployees = allEmployees.filter { employee ->
+            searchQuery.isBlank() ||
+                    employee.fullName.contains(searchQuery, ignoreCase = true) ||
+                    employee.email.contains(searchQuery, ignoreCase = true)
+        }
+
+        _uiState.value = _uiState.value.copy(
+            employees = filteredEmployees,
+            isLoading = false
+        )
     }
 }

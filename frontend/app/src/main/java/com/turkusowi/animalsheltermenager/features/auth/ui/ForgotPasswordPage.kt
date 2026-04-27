@@ -1,28 +1,42 @@
 package com.turkusowi.animalsheltermenager.features.auth.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.turkusowi.animalsheltermenager.features.auth.AuthUiState
 
 @Composable
 fun ForgotPasswordPage(
-    onSendEmailClick: () -> Unit, // Ta nazwa musi się zgadzać z AppNavGraph
+    state: AuthUiState,
+    onSendEmailClick: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
-    var isSent by remember { mutableStateOf(false) }
-
-    // Symulacja bazy danych - domyślnie na TRUE
-    val userExistsInDatabase = true
 
     Column(
         modifier = Modifier
@@ -32,16 +46,16 @@ fun ForgotPasswordPage(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Resetowanie hasła",
+            text = "Resetowanie hasla",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (!isSent) {
+        if (!state.isPasswordResetSent) {
             Text(
-                text = "Podaj swój email, aby otrzymać link do resetowania hasła.",
+                text = "Podaj swoj email, aby otrzymac link do resetowania hasla.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -59,11 +73,12 @@ fun ForgotPasswordPage(
 
             if (errorMessage.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Text(text = errorMessage, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
+
+            state.errorMessage?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -71,24 +86,21 @@ fun ForgotPasswordPage(
             Button(
                 onClick = {
                     val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
-
-                    if (email.isBlank()) {
-                        errorMessage = "Wpisz adres email!"
-                    } else if (!emailRegex.matches(email)) {
-                        errorMessage = "To nie jest poprawny format email!"
-                    } else if (!userExistsInDatabase) {
-                        errorMessage = "Nie znaleźliśmy konta przypisanego do tego maila."
-                    } else {
-                        errorMessage = ""
-                        isSent = true // Pokazuje ekran sukcesu
+                    when {
+                        email.isBlank() -> errorMessage = "Wpisz adres email!"
+                        !emailRegex.matches(email) -> errorMessage = "To nie jest poprawny format email!"
+                        else -> {
+                            errorMessage = ""
+                            onSendEmailClick(email)
+                        }
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading
             ) {
-                Text("Wyślij link")
+                Text(if (state.isLoading) "Wysylanie..." else "Wyslij link")
             }
         } else {
-            // Widok po "wysłaniu" maila
             Icon(
                 imageVector = Icons.Default.Email,
                 contentDescription = null,
@@ -96,13 +108,13 @@ fun ForgotPasswordPage(
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Link wysłany na: $email", fontWeight = FontWeight.Medium)
-            Text(text = "Sprawdź skrzynkę odbiorczą.", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Link wyslany na: $email", fontWeight = FontWeight.Medium)
+            Text(text = state.resetMessage ?: "Sprawdz skrzynke odbiorcza.", style = MaterialTheme.typography.bodySmall)
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onSendEmailClick, // Przycisk powrotu po sukcesie
+                onClick = onNavigateBack,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Ok, rozumiem")
@@ -112,7 +124,7 @@ fun ForgotPasswordPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = onNavigateBack) {
-            Text("Powrót do logowania")
+            Text("Powrot do logowania")
         }
     }
 }
