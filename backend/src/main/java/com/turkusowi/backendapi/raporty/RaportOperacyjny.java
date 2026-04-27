@@ -23,7 +23,7 @@ public class RaportOperacyjny {
     @Column(name = "typ_raportu", nullable = false, length = 100)
     private String typRaportu;
 
-    @Column(name = "uwagi")
+    @Column(name = "uwagi", columnDefinition = "TEXT")
     private String uwagi;
 
     public Integer getId() {

@@ -22,7 +22,7 @@ public class HistoriaMedyczna {
     @JoinColumn(name = "pracownik_id", nullable = false)
     private Uzytkownik pracownik;
 
-    @Column(name = "opis_zabiegu", nullable = false)
+    @Column(name = "opis_zabiegu", nullable = false, columnDefinition = "TEXT")
     private String opisZabiegu;
 
     @Column(name = "data_wpisu", nullable = false)
