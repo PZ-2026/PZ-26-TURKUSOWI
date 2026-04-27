@@ -31,6 +31,7 @@ logs/
 secrets/
 *.pem
 *.key
+local.properties
 
 # =========================
 # ROOT / GENERAL BUILD
@@ -50,49 +51,17 @@ target/
 # =========================
 # BACKEND (Spring Boot / Java)
 # =========================
-backend/.gradle/
-backend/build/
-backend/out/
-
 # IntelliJ/STS/Eclipse
-backend/.classpath
-backend/.project
-backend/.settings/
-backend/.factorypath
+.classpath
+.project
+.settings/
+.factorypath
 
 # Wrapper cache (nie ignorujemy samych plików wrappera)
-!backend/gradlew
-!backend/gradlew.bat
-!backend/gradle/wrapper/gradle-wrapper.jar
-!backend/gradle/wrapper/gradle-wrapper.properties
-
-# =========================
-# FRONTEND (Android)
-# =========================
-frontend/.gradle/
-frontend/build/
-frontend/local.properties
-frontend/.cxx/
-frontend/captures/
-
-# Android Studio
-frontend/.idea/caches/
-frontend/.idea/libraries/
-frontend/.idea/modules.xml
-frontend/.idea/workspace.xml
-frontend/.idea/navEditor.xml
-frontend/.idea/assetWizardSettings.xml
-frontend/.idea/shelf/
-frontend/.idea/compiler.xml
-
-# APK / AAB
-*.apk
-*.aab
-*.ap_
-*.dex
-
-# NDK
-*.so
+!gradlew
+!gradlew.bat
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 
 # =========================
 # KOTLIN / JAVA
@@ -101,9 +70,6 @@ frontend/.idea/compiler.xml
 *.jar
 *.war
 *.ear
-
-# wyjątek dla wrappera i jeśli chcesz trzymać pojedyncze jar-y ręcznie, usuń ten blok
-!backend/gradle/wrapper/gradle-wrapper.jar
 
 # =========================
 # TEST / COVERAGE
