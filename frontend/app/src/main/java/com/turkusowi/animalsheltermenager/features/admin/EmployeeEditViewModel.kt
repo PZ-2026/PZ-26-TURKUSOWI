@@ -25,7 +25,7 @@ data class EmployeeEditUiState(
 
 class EmployeeEditViewModel(
     private val employeeId: String,
-    private val repository: AdminRepository = InMemoryAdminRepository
+    private val repository: AdminRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EmployeeEditUiState())
@@ -45,17 +45,19 @@ class EmployeeEditViewModel(
             return
         }
 
-        val employee = repository.getEmployeeById(employeeId)
-        if (employee == null) {
-            _uiState.value = EmployeeEditUiState(
-                isLoading = false,
-                employeeNotFound = true,
-                errorMessage = "Nie znaleziono pracownika."
-            )
-            return
-        }
+        viewModelScope.launch {
+            val employee = repository.getEmployeeById(employeeId)
+            if (employee == null) {
+                _uiState.value = EmployeeEditUiState(
+                    isLoading = false,
+                    employeeNotFound = true,
+                    errorMessage = "Nie znaleziono pracownika."
+                )
+                return@launch
+            }
 
-        _uiState.value = employee.toUiState()
+            _uiState.value = employee.toUiState()
+        }
     }
 
     fun onFirstNameChange(value: String) {

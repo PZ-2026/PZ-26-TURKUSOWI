@@ -1,21 +1,42 @@
 package com.turkusowi.animalsheltermenager.features.auth.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.turkusowi.animalsheltermenager.features.auth.AuthUiState
 
 @Composable
 fun WelcomeLoginPage(
-    onLoginSuccess: () -> Unit,
+    state: AuthUiState,
+    onLoginClick: (String, String) -> Unit,
     onEnterAsGuest: () -> Unit,
     onNavigateToRegister: () -> Unit,
     onNavigateToForgotPassword: () -> Unit
@@ -23,7 +44,6 @@ fun WelcomeLoginPage(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var rememberMe by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -63,7 +83,7 @@ fun WelcomeLoginPage(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Hasło") },
+            label = { Text("Haslo") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
@@ -79,42 +99,24 @@ fun WelcomeLoginPage(
                     checked = rememberMe,
                     onCheckedChange = { rememberMe = it }
                 )
-                Text("Zapamiętaj mnie", style = MaterialTheme.typography.bodySmall)
+                Text("Zapamietaj mnie", style = MaterialTheme.typography.bodySmall)
             }
             TextButton(onClick = onNavigateToForgotPassword) {
-                Text("Nie pamiętasz hasła?", style = MaterialTheme.typography.bodySmall)
+                Text("Nie pamietasz hasla?", style = MaterialTheme.typography.bodySmall)
             }
         }
 
-        if (errorMessage.isNotEmpty()) {
-            Text(text = errorMessage, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        state.errorMessage?.let {
+            Text(text = it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(8.dp))
-        } else {
-            Spacer(modifier = Modifier.height(24.dp))
-        }
+        } ?: Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = {
-                val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
-
-                // Kolejność walidacji
-                if (email.isBlank() || password.isBlank()) {
-                    errorMessage = "Uzupełnij email i hasło!"
-                } else if (!emailRegex.matches(email)) {
-                    errorMessage = "Podaj poprawny format email!"
-                } else if (email == "admin@schronisko.pl" && password == "admin123") {
-                    errorMessage = ""
-                    onLoginSuccess()
-                } else if (email == "user@schronisko.pl" && password == "user123") {
-                    errorMessage = ""
-                    onLoginSuccess()
-                } else {
-                    errorMessage = "Błędne dane logowania!"
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { onLoginClick(email, password) },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !state.isLoading
         ) {
-            Text("Zaloguj się")
+            Text(if (state.isLoading) "Logowanie..." else "Zaloguj sie")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -123,13 +125,13 @@ fun WelcomeLoginPage(
             onClick = onEnterAsGuest,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Wejdź jako Gość")
+            Text("Wejdz jako Gosc")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = onNavigateToRegister) {
-            Text("Nie masz konta? Zarejestruj się")
+            Text("Nie masz konta? Zarejestruj sie")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
