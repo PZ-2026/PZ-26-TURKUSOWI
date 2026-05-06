@@ -44,7 +44,9 @@ class AuthControllerTest {
                 "Anna",
                 "Nowak",
                 "ADMIN",
-                true
+                true,
+                "jwt-token",
+                "Bearer"
         ));
 
         mockMvc.perform(post("/api/auth/login")
@@ -57,7 +59,9 @@ class AuthControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rola").value("ADMIN"))
-                .andExpect(jsonPath("$.email").value("admin@schronisko.pl"));
+                .andExpect(jsonPath("$.email").value("admin@schronisko.pl"))
+                .andExpect(jsonPath("$.accessToken").value("jwt-token"))
+                .andExpect(jsonPath("$.tokenType").value("Bearer"));
     }
 
     @Test

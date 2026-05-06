@@ -5,6 +5,7 @@ import com.turkusowi.backendapi.common.NotFoundException;
 import com.turkusowi.backendapi.role.Rola;
 import com.turkusowi.backendapi.role.RolaService;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +15,16 @@ public class UzytkownikService {
 
     private final UzytkownikRepository uzytkownikRepository;
     private final RolaService rolaService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UzytkownikService(UzytkownikRepository uzytkownikRepository, RolaService rolaService) {
+    public UzytkownikService(
+            UzytkownikRepository uzytkownikRepository,
+            RolaService rolaService,
+            PasswordEncoder passwordEncoder
+    ) {
         this.uzytkownikRepository = uzytkownikRepository;
         this.rolaService = rolaService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UzytkownikResponse> findAll(Integer rolaId, Boolean aktywny) {
@@ -80,11 +87,22 @@ public class UzytkownikService {
         Rola rola = rolaService.getRequiredEntity(request.rolaId());
 
         uzytkownik.setEmail(request.email().trim());
-        uzytkownik.setHasloHash(request.hasloHash().trim());
+        if (request.hasloHash() != null && !request.hasloHash().isBlank()) {
+            uzytkownik.setHasloHash(normalizePasswordForStorage(request.hasloHash()));
+        }
         uzytkownik.setImie(request.imie().trim());
         uzytkownik.setNazwisko(request.nazwisko().trim());
         uzytkownik.setRola(rola);
         uzytkownik.setCzyAktywny(request.czyAktywny());
+    }
+
+    private String normalizePasswordForStorage(String passwordValue) {
+        String trimmed = passwordValue.trim();
+        if (trimmed.startsWith("$2a$") || trimmed.startsWith("$2b$") || trimmed.startsWith("$2y$")) {
+            return trimmed;
+        }
+
+        return passwordEncoder.encode(trimmed);
     }
 
     private UzytkownikResponse mapToResponse(Uzytkownik uzytkownik) {

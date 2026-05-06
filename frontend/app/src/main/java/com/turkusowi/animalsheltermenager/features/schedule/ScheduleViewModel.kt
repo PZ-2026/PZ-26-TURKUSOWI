@@ -26,8 +26,9 @@ class ScheduleViewModel(
 
     fun refresh() {
         viewModelScope.launch {
-            val userId = sessionManager.currentUser.value?.id
-            if (userId == null) {
+            val currentUser = sessionManager.currentUser.value
+            val userId = currentUser?.id
+            if (userId == null || currentUser.isGuest) {
                 _uiState.value = ScheduleUiState(isLoading = false, errorMessage = "Najpierw zaloguj sie, aby zobaczyc terminy.")
                 return@launch
             }

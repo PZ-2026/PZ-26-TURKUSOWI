@@ -38,7 +38,11 @@ class ProfileViewModel(
             }
 
             runCatching {
-                val walks = repository.getReservations(volunteerId = currentUser.id).take(3)
+                val walks = if (currentUser.isGuest) {
+                    emptyList()
+                } else {
+                    repository.getReservations(volunteerId = currentUser.id).take(3)
+                }
                 val animals = repository.getAnimals().take(4)
                 ProfileUiState(
                     isLoading = false,

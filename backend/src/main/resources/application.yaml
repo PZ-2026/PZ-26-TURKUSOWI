@@ -15,3 +15,8 @@ spring:
     properties:
       hibernate:
         format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:turkusowi-backend-jwt-dev-secret-key-please-change-in-production-2026}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}

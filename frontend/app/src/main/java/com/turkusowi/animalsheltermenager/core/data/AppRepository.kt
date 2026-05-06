@@ -32,6 +32,7 @@ data class SessionUser(
     val firstName: String,
     val lastName: String,
     val role: String,
+    val accessToken: String? = null,
     val isGuest: Boolean = false
 ) {
     val fullName: String
@@ -109,7 +110,16 @@ private interface BackendApi {
 private data class LoginRequestDto(val email: String, val password: String)
 private data class RegisterRequestDto(val imie: String, val nazwisko: String, val email: String, val password: String)
 private data class ForgotPasswordRequestDto(val email: String)
-private data class AuthUserDto(val id: Int, val email: String, val imie: String, val nazwisko: String, val rola: String, val czyAktywny: Boolean)
+private data class AuthUserDto(
+    val id: Int,
+    val email: String,
+    val imie: String,
+    val nazwisko: String,
+    val rola: String,
+    val czyAktywny: Boolean,
+    val accessToken: String,
+    val tokenType: String
+)
 private data class MessageResponseDto(val message: String)
 private data class AnimalDto(
     val id: Int,
@@ -134,7 +144,7 @@ private data class UserDto(
 )
 private data class UpdateUserRequestDto(
     val email: String,
-    val hasloHash: String,
+    val hasloHash: String? = null,
     val imie: String,
     val nazwisko: String,
     val rolaId: Int,
@@ -177,6 +187,7 @@ class SessionManager {
             firstName = "Gosc",
             lastName = "",
             role = "GOSC",
+            accessToken = null,
             isGuest = true
         )
     }
@@ -186,7 +197,9 @@ class SessionManager {
     }
 }
 
-class AppRepository {
+class AppRepository(
+    private val sessionManager: SessionManager
+) {
 
     private val api: BackendApi by lazy {
         val logging = HttpLoggingInterceptor().apply {
@@ -194,6 +207,15 @@ class AppRepository {
         }
 
         val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val requestBuilder = chain.request().newBuilder()
+                sessionManager.currentUser.value?.accessToken
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { token ->
+                        requestBuilder.addHeader("Authorization", "Bearer $token")
+                    }
+                chain.proceed(requestBuilder.build())
+            }
             .addInterceptor(logging)
             .build()
 
@@ -247,7 +269,7 @@ class AppRepository {
             id = employee.id.toInt(),
             payload = UpdateUserRequestDto(
                 email = employee.email,
-                hasloHash = "temporary123",
+                hasloHash = null,
                 imie = employee.firstName,
                 nazwisko = employee.lastName,
                 rolaId = employee.role.toRoleId(),
@@ -294,7 +316,8 @@ class AppRepository {
             email = email,
             firstName = imie,
             lastName = nazwisko,
-            role = rola
+            role = rola,
+            accessToken = accessToken
         )
     }
 

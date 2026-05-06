@@ -48,7 +48,9 @@ record AuthUserResponse(
         String imie,
         String nazwisko,
         String rola,
-        boolean czyAktywny
+        boolean czyAktywny,
+        String accessToken,
+        String tokenType
 ) {
 }
 
