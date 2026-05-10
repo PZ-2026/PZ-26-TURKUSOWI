@@ -17,6 +17,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
+    private static final String ADMIN = "ADMIN";
+    private static final String PRACOWNIK = "PRACOWNIK";
+    private static final String WOLONTARIUSZ = "WOLONTARIUSZ";
+
+    private static final String[] STAFF_ROLES = {ADMIN, PRACOWNIK};
+    private static final String[] APP_USER_ROLES = {ADMIN, PRACOWNIK, WOLONTARIUSZ};
+
+    private static final String[] ZWIERZETA_ENDPOINTS = {"/api/zwierzeta", "/api/zwierzeta/**"};
+    private static final String[] RASY_ENDPOINTS = {"/api/rasy", "/api/rasy/**"};
+    private static final String[] REZERWACJE_ENDPOINTS = {"/api/rezerwacje-spacerow", "/api/rezerwacje-spacerow/**"};
+    private static final String[] HISTORIA_ENDPOINTS = {"/api/historia-medyczna", "/api/historia-medyczna/**"};
+    private static final String[] RAPORTY_ENDPOINTS = {"/api/raporty-operacyjne", "/api/raporty-operacyjne/**"};
+    private static final String[] UZYTKOWNICY_ENDPOINTS = {"/api/uzytkownicy", "/api/uzytkownicy/**"};
+    private static final String[] ROLE_ENDPOINTS = {"/api/role", "/api/role/**"};
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         return http
@@ -27,10 +42,16 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/zwierzeta/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/rasy/**", "/api/role/**").permitAll()
-                        .requestMatchers("/api/uzytkownicy/**", "/api/raporty-operacyjne/**").hasRole("ADMIN")
-                        .requestMatchers("/api/rezerwacje-spacerow/**", "/api/historia-medyczna/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/zwierzeta/publiczne").permitAll()
+                        .requestMatchers(HttpMethod.GET, RASY_ENDPOINTS).permitAll()
+                        .requestMatchers(UZYTKOWNICY_ENDPOINTS).hasRole(ADMIN)
+                        .requestMatchers(ROLE_ENDPOINTS).hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.GET, ZWIERZETA_ENDPOINTS).hasAnyRole(APP_USER_ROLES)
+                        .requestMatchers(ZWIERZETA_ENDPOINTS).hasAnyRole(STAFF_ROLES)
+                        .requestMatchers(RASY_ENDPOINTS).hasAnyRole(STAFF_ROLES)
+                        .requestMatchers(REZERWACJE_ENDPOINTS).hasAnyRole(APP_USER_ROLES)
+                        .requestMatchers(HISTORIA_ENDPOINTS).hasAnyRole(STAFF_ROLES)
+                        .requestMatchers(RAPORTY_ENDPOINTS).hasAnyRole(STAFF_ROLES)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
