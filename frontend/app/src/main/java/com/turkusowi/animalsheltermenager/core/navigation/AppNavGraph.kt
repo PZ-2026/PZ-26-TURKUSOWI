@@ -49,8 +49,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
-    val repository = remember { AppRepository() }
     val sessionManager = remember { SessionManager() }
+    val repository = remember(sessionManager) { AppRepository(sessionManager) }
     val authViewModel = remember { AuthViewModel(repository, sessionManager) }
     val homeViewModel = remember { HomeViewModel(repository, sessionManager) }
     val scheduleViewModel = remember { ScheduleViewModel(repository, sessionManager) }
@@ -229,7 +229,7 @@ fun AppNavGraph(navController: NavHostController, modifier: Modifier = Modifier)
                         onBackClick = { navController.popBackStack() },
                         onScheduleClick = {
                             val userId = currentUser?.id
-                            if (userId == null || currentUser?.role.equals("ADMIN", true)) {
+                            if (userId == null || currentUser?.role.equals("ADMIN", true) || currentUser?.isGuest == true) {
                                 Toast.makeText(context, "Spacer moze zaplanowac zalogowany wolontariusz.", Toast.LENGTH_SHORT).show()
                             } else {
                                 val selectedAnimal = animalState.value!!

@@ -6,6 +6,7 @@ import com.turkusowi.backendapi.role.Rola;
 import com.turkusowi.backendapi.role.RolaService;
 import com.turkusowi.backendapi.uzytkownicy.Uzytkownik;
 import com.turkusowi.backendapi.uzytkownicy.UzytkownikRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,10 +16,19 @@ public class AuthService {
 
     private final UzytkownikRepository uzytkownikRepository;
     private final RolaService rolaService;
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UzytkownikRepository uzytkownikRepository, RolaService rolaService) {
+    public AuthService(
+            UzytkownikRepository uzytkownikRepository,
+            RolaService rolaService,
+            JwtService jwtService,
+            PasswordEncoder passwordEncoder
+    ) {
         this.uzytkownikRepository = uzytkownikRepository;
         this.rolaService = rolaService;
+        this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public AuthUserResponse login(LoginRequest request) {
@@ -29,12 +39,18 @@ public class AuthService {
             throw new ConflictException("To konto jest nieaktywne.");
         }
 
-        if (!uzytkownik.getHasloHash().equals(request.password())) {
+        boolean passwordMatches = matchesPassword(request.password(), uzytkownik.getHasloHash());
+        if (!passwordMatches) {
             throw new ConflictException("Niepoprawne dane logowania.");
         }
 
+        if (isLegacyPlainTextPassword(request.password(), uzytkownik.getHasloHash())) {
+            uzytkownik.setHasloHash(passwordEncoder.encode(request.password()));
+        }
+
         uzytkownik.setOstatnieLogowanie(LocalDateTime.now());
-        return mapToAuthUser(uzytkownikRepository.save(uzytkownik));
+        Uzytkownik savedUser = uzytkownikRepository.save(uzytkownik);
+        return mapToAuthUser(savedUser, jwtService.generateToken(savedUser));
     }
 
     public AuthUserResponse register(RegisterRequest request) {
@@ -49,11 +65,12 @@ public class AuthService {
         uzytkownik.setImie(request.imie().trim());
         uzytkownik.setNazwisko(request.nazwisko().trim());
         uzytkownik.setEmail(normalizedEmail);
-        uzytkownik.setHasloHash(request.password());
+        uzytkownik.setHasloHash(passwordEncoder.encode(request.password()));
         uzytkownik.setRola(volunteerRole);
         uzytkownik.setCzyAktywny(true);
 
-        return mapToAuthUser(uzytkownikRepository.save(uzytkownik));
+        Uzytkownik savedUser = uzytkownikRepository.save(uzytkownik);
+        return mapToAuthUser(savedUser, jwtService.generateToken(savedUser));
     }
 
     public AuthMessageResponse forgotPassword(ForgotPasswordRequest request) {
@@ -63,14 +80,28 @@ public class AuthService {
         return new AuthMessageResponse("Wyslalismy instrukcje resetu hasla na podany adres email.");
     }
 
-    private AuthUserResponse mapToAuthUser(Uzytkownik uzytkownik) {
+    private boolean matchesPassword(String rawPassword, String storedPasswordHash) {
+        try {
+            return passwordEncoder.matches(rawPassword, storedPasswordHash);
+        } catch (IllegalArgumentException ignored) {
+            return rawPassword.equals(storedPasswordHash);
+        }
+    }
+
+    private boolean isLegacyPlainTextPassword(String rawPassword, String storedPasswordHash) {
+        return rawPassword.equals(storedPasswordHash);
+    }
+
+    private AuthUserResponse mapToAuthUser(Uzytkownik uzytkownik, String accessToken) {
         return new AuthUserResponse(
                 uzytkownik.getId(),
                 uzytkownik.getEmail(),
                 uzytkownik.getImie(),
                 uzytkownik.getNazwisko(),
                 uzytkownik.getRola().getNazwa(),
-                uzytkownik.isCzyAktywny()
+                uzytkownik.isCzyAktywny(),
+                accessToken,
+                "Bearer"
         );
     }
 }

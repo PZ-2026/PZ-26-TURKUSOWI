@@ -8,7 +8,6 @@ import com.turkusowi.animalsheltermenager.features.animals.Animal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class HomeUiState(
@@ -34,7 +33,10 @@ class HomeViewModel(
             runCatching {
                 val currentUser = sessionManager.currentUser.value
                 val animals = repository.getAnimals()
-                val reservations = currentUser?.let { repository.getReservations(volunteerId = it.id) }.orEmpty()
+                val reservations = currentUser
+                    ?.takeUnless { it.isGuest }
+                    ?.let { repository.getReservations(volunteerId = it.id) }
+                    .orEmpty()
 
                 HomeUiState(
                     isLoading = false,

@@ -8,3 +8,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+
+security:
+  jwt:
+    secret: turkusowi-backend-jwt-dev-secret-key-please-change-in-production-2026
+    expiration-ms: 86400000

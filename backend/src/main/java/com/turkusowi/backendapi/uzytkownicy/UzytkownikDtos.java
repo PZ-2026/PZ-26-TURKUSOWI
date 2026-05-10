@@ -13,8 +13,8 @@ record CreateUzytkownikRequest(
         @Size(max = 255, message = "Email moze miec maksymalnie 255 znakow.")
         String email,
 
-        @NotBlank(message = "Haslo hash jest wymagane.")
-        @Size(max = 255, message = "Haslo hash moze miec maksymalnie 255 znakow.")
+        @NotBlank(message = "Haslo jest wymagane.")
+        @Size(max = 255, message = "Haslo moze miec maksymalnie 255 znakow.")
         String hasloHash,
 
         @NotBlank(message = "Imie jest wymagane.")
@@ -38,8 +38,7 @@ record UpdateUzytkownikRequest(
         @Size(max = 255, message = "Email moze miec maksymalnie 255 znakow.")
         String email,
 
-        @NotBlank(message = "Haslo hash jest wymagane.")
-        @Size(max = 255, message = "Haslo hash moze miec maksymalnie 255 znakow.")
+        @Size(max = 255, message = "Haslo moze miec maksymalnie 255 znakow.")
         String hasloHash,
 
         @NotBlank(message = "Imie jest wymagane.")
