@@ -35,6 +35,9 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      APP_AUTH_AUDIT_LOG_DIR: /app/logs/auth
+    volumes:
+      - ./backend/logs:/app/logs
     depends_on:
       postgres-db:
         condition: service_healthy

@@ -18,6 +18,7 @@ local.properties
 
 # General logs / coverage
 *.log
+backend/logs/
 coverage/
 jacoco/
 *.exec

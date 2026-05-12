@@ -18,29 +18,38 @@ public class AuthService {
     private final RolaService rolaService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthAuditFileLogger authAuditFileLogger;
 
     public AuthService(
             UzytkownikRepository uzytkownikRepository,
             RolaService rolaService,
             JwtService jwtService,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            AuthAuditFileLogger authAuditFileLogger
     ) {
         this.uzytkownikRepository = uzytkownikRepository;
         this.rolaService = rolaService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.authAuditFileLogger = authAuditFileLogger;
     }
 
     public AuthUserResponse login(LoginRequest request) {
-        Uzytkownik uzytkownik = uzytkownikRepository.findByEmailIgnoreCase(request.email().trim())
-                .orElseThrow(() -> new NotFoundException("Nie znaleziono konta dla podanego adresu email."));
+        String normalizedEmail = request.email().trim();
+        Uzytkownik uzytkownik = uzytkownikRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseThrow(() -> {
+                    authAuditFileLogger.logLoginFailure(normalizedEmail, "Nie znaleziono konta dla podanego adresu email.");
+                    return new NotFoundException("Nie znaleziono konta dla podanego adresu email.");
+                });
 
         if (!uzytkownik.isCzyAktywny()) {
+            authAuditFileLogger.logLoginFailure(normalizedEmail, "To konto jest nieaktywne.");
             throw new ConflictException("To konto jest nieaktywne.");
         }
 
         boolean passwordMatches = matchesPassword(request.password(), uzytkownik.getHasloHash());
         if (!passwordMatches) {
+            authAuditFileLogger.logLoginFailure(normalizedEmail, "Niepoprawne dane logowania.");
             throw new ConflictException("Niepoprawne dane logowania.");
         }
 
@@ -50,12 +59,15 @@ public class AuthService {
 
         uzytkownik.setOstatnieLogowanie(LocalDateTime.now());
         Uzytkownik savedUser = uzytkownikRepository.save(uzytkownik);
-        return mapToAuthUser(savedUser, jwtService.generateToken(savedUser));
+        AuthUserResponse response = mapToAuthUser(savedUser, jwtService.generateToken(savedUser));
+        authAuditFileLogger.logLoginSuccess(savedUser);
+        return response;
     }
 
     public AuthUserResponse register(RegisterRequest request) {
         String normalizedEmail = request.email().trim();
         if (uzytkownikRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            authAuditFileLogger.logRegisterFailure(normalizedEmail, "Uzytkownik z tym adresem email juz istnieje.");
             throw new ConflictException("Uzytkownik z adresem email '" + normalizedEmail + "' juz istnieje.");
         }
 
@@ -70,7 +82,9 @@ public class AuthService {
         uzytkownik.setCzyAktywny(true);
 
         Uzytkownik savedUser = uzytkownikRepository.save(uzytkownik);
-        return mapToAuthUser(savedUser, jwtService.generateToken(savedUser));
+        AuthUserResponse response = mapToAuthUser(savedUser, jwtService.generateToken(savedUser));
+        authAuditFileLogger.logRegisterSuccess(savedUser);
+        return response;
     }
 
     public AuthMessageResponse forgotPassword(ForgotPasswordRequest request) {

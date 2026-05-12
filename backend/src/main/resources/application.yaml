@@ -20,3 +20,7 @@ security:
   jwt:
     secret: ${JWT_SECRET:turkusowi-backend-jwt-dev-secret-key-please-change-in-production-2026}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+app:
+  auth:
+    audit-log-dir: ${APP_AUTH_AUDIT_LOG_DIR:logs/auth}

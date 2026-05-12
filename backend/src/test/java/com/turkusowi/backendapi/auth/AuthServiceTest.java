@@ -38,6 +38,9 @@ class AuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private AuthAuditFileLogger authAuditFileLogger;
+
     @InjectMocks
     private AuthService authService;
 
@@ -58,6 +61,7 @@ class AuthServiceTest {
         assertThat(user.getOstatnieLogowanie()).isNotNull();
         assertThat(user.getHasloHash()).isEqualTo("$2a$encoded-admin123");
         verify(uzytkownikRepository).save(user);
+        verify(authAuditFileLogger).logLoginSuccess(user);
     }
 
     @Test
@@ -68,6 +72,8 @@ class AuthServiceTest {
         assertThatThrownBy(() -> authService.login(new LoginRequest("admin@schronisko.pl", "admin123")))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("To konto jest nieaktywne.");
+
+        verify(authAuditFileLogger).logLoginFailure("admin@schronisko.pl", "To konto jest nieaktywne.");
     }
 
     @Test
@@ -79,6 +85,19 @@ class AuthServiceTest {
         assertThatThrownBy(() -> authService.login(new LoginRequest("admin@schronisko.pl", "wrong")))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("Niepoprawne dane logowania.");
+
+        verify(authAuditFileLogger).logLoginFailure("admin@schronisko.pl", "Niepoprawne dane logowania.");
+    }
+
+    @Test
+    void shouldRejectLoginWhenUserDoesNotExist() {
+        given(uzytkownikRepository.findByEmailIgnoreCase("ghost@schronisko.pl")).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> authService.login(new LoginRequest(" ghost@schronisko.pl ", "whatever")))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Nie znaleziono konta dla podanego adresu email.");
+
+        verify(authAuditFileLogger).logLoginFailure("ghost@schronisko.pl", "Nie znaleziono konta dla podanego adresu email.");
     }
 
     @Test
@@ -112,6 +131,7 @@ class AuthServiceTest {
         assertThat(response.id()).isEqualTo(5);
         assertThat(response.rola()).isEqualTo("WOLONTARIUSZ");
         assertThat(response.accessToken()).isEqualTo("register-token");
+        verify(authAuditFileLogger).logRegisterSuccess(savedUser);
     }
 
     @Test
@@ -123,6 +143,8 @@ class AuthServiceTest {
         ))
                 .isInstanceOf(ConflictException.class)
                 .hasMessage("Uzytkownik z adresem email 'admin@schronisko.pl' juz istnieje.");
+
+        verify(authAuditFileLogger).logRegisterFailure("admin@schronisko.pl", "Uzytkownik z tym adresem email juz istnieje.");
     }
 
     @Test
